@@ -1,0 +1,3 @@
+/home/ubuntu/project/socketEcho/tcpClient/build/CMakeFiles/tcpClient.dir
+/home/ubuntu/project/socketEcho/tcpClient/build/CMakeFiles/edit_cache.dir
+/home/ubuntu/project/socketEcho/tcpClient/build/CMakeFiles/rebuild_cache.dir
