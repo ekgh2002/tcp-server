@@ -6,7 +6,7 @@
 
 #define TCP_PORT 5100
 
-int main(int argc, char **argv)
+int main(int argc, char **argv/*주소값이 들어감*/)
 {
     int ssock;
     struct sockaddr_in servaddr;
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     servaddr.sin_family = AF_INET;
 
     /* 문자열을 네트워크 주소로 변경 */
-    inet_pton(AF_INET, argv[1], &(servaddr.sin_addr.s_addr));
+    inet_pton(AF_INET, argv[1]/*ip주소를 넣겠다.*/, &(servaddr.sin_addr.s_addr));
     servaddr.sin_port = htons(TCP_PORT);
 
     /* 지정한 주소로 접속 */
