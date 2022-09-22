@@ -17,44 +17,48 @@ int main(int argc, char **argv/*주소값이 들어감*/)
         printf("Usage : %s IP_ADRESS\n", argv[0]);
         return -1;
     }
-
-    /* 소켓을 생성 */
-    if((ssock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    while(1)
     {
-        perror("socket()");
-        return -1;
+        /* 소켓을 생성 */
+        if((ssock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        {
+            perror("socket()");
+            return -1;
+        }
+
+        /* 소켓이 접속할 주소 지정 */
+        memset(&servaddr, 0, sizeof(servaddr));
+        servaddr.sin_family = AF_INET;
+
+        /* 문자열을 네트워크 주소로 변경 */
+        inet_pton(AF_INET, argv[1]/*ip주소를 넣겠다.*/, &(servaddr.sin_addr.s_addr));
+        servaddr.sin_port = htons(TCP_PORT);
+
+        /* 지정한 주소로 접속 */
+        if(connect(ssock, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
+        {
+            perror("connect()");
+            return -1;
+        }
+
+        fgets(mesg, BUFSIZ, stdin);
+        if(!strncmp(mesg, "exit", 4))   break;
+        if(send(ssock, mesg, BUFSIZ, MSG_DONTWAIT) <= 0) /* 데이터를 소켓에 쏨*/
+        {
+            perror("send()");
+            return -1;
+        }
+
+        memset(mesg, 0, BUFSIZ);
+        if(recv(ssock, mesg, BUFSIZ, 0) <= 0) /* 데이터를 소켓으로부터 읽음 */
+        {
+            perror("recv()");
+            return -1;
+        }
+
+        printf("Received data : %s ", mesg); /* 받은 문자열을 화면에 출력 */
+        close(ssock);
     }
-
-    /* 소켓이 접속할 주소 지정 */
-    memset(&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-
-    /* 문자열을 네트워크 주소로 변경 */
-    inet_pton(AF_INET, argv[1]/*ip주소를 넣겠다.*/, &(servaddr.sin_addr.s_addr));
-    servaddr.sin_port = htons(TCP_PORT);
-
-    /* 지정한 주소로 접속 */
-    if(connect(ssock, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
-    {
-        perror("connect()");
-        return -1;
-    }
-
-    fgets(mesg, BUFSIZ, stdin);
-    if(send(ssock, mesg, BUFSIZ, MSG_DONTWAIT) <= 0) /* 데이터를 소켓에 쏨*/
-    {
-        perror("send()");
-        return -1;
-    }
-
-    memset(mesg, 0, BUFSIZ);
-    if(recv(ssock, mesg, BUFSIZ, 0) <= 0) /* 데이터를 소켓으로부터 읽음 */
-    {
-        perror("recv()");
-        return -1;
-    }
-
-    printf("Received data : %s ", mesg); /* 받은 문자열을 화면에 출력 */
 
     close(ssock); /* 소켓을 닫음 */
 
